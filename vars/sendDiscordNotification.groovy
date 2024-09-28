@@ -1,6 +1,10 @@
-def call(String title, String message, String status, String webhookUrl) {
+import java.text.SimpleDateFormat
 
-    def color = status == "success" ? "3066993" : "15158332" 
+def call(String title, String message, String status, String webhookUrl) {
+    // Buat payload untuk notifikasi Discord
+    def color = status == "success" ? 3066993 : 15158332
+    def timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date())
+    
     def payload = [
         embeds: [
             [
@@ -10,7 +14,7 @@ def call(String title, String message, String status, String webhookUrl) {
                 footer: [
                     text: "Status: ${status}",
                 ],
-                timestamp: new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z", TimeZone.getTimeZone('UTC'))
+                timestamp: timestamp
             ]
         ]
     ]
@@ -18,6 +22,7 @@ def call(String title, String message, String status, String webhookUrl) {
     // Kirim notifikasi ke Discord menggunakan curl
     def response = sh(script: "curl -H 'Content-Type: application/json' -d '${groovy.json.JsonOutput.toJson(payload)}' ${webhookUrl}", returnStatus: true)
 
+    // Cek status 
     if (response != 0) {
         error "Failed to send Discord notification"
     }
