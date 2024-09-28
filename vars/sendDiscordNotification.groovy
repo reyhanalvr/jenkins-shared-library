@@ -1,6 +1,6 @@
 import groovy.json.JsonOutput
 
-def sendNotification(String title, String description, String status, String webhookUrl) {
+def sendDiscordNotification(String title, String description, String status, String webhookUrl) {
     def color = (status == "success") ? 65280 : 16711680 // Hijau untuk sukses, Merah untuk error
     def payload = [
         embeds: [
