@@ -1,22 +1,14 @@
-import groovy.json.JsonOutput
-
-def sendDiscordNotification(String title, String description, String status, String webhookUrl) {
-    def color = (status == "success") ? 65280 : 16711680 // Hijau untuk sukses, Merah untuk error
+def call(String title, String message, String status, String webhookUrl) {
+    // Buat payload untuk notifikasi Discord
     def payload = [
-        embeds: [
-            [
-                title: title,
-                description: description,
-                color: color,
-                footer: [
-                    text: "Notifikasi dari Jenkins"
-                ]
-            ]
-        ]
+        content: "${title}\n${message}\nStatus: ${status}"
     ]
-    
-    def jsonPayload = JsonOutput.toJson(payload)
-    sh """
-    curl -H "Content-Type: application/json" -d '${jsonPayload}' ${webhookUrl}
-    """
+
+    // Kirim notifikasi ke Discord menggunakan curl
+    def response = sh(script: "curl -H 'Content-Type: application/json' -d '${groovy.json.JsonOutput.toJson(payload)}' ${webhookUrl}", returnStatus: true)
+
+    // Cek status pengiriman
+    if (response != 0) {
+        error "Failed to send Discord notification"
+    }
 }
